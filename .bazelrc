@@ -1,0 +1,6 @@
+build --compiler=clang-cl
+build --cxxopt=-fcolor-diagnostics
+build --cxxopt=-fansi-escape-codes
+build --cxxopt=/D_HAS_DEPRECATED_RESULT_OF=1
+build --cxxopt=-Xclang
+build --cxxopt=-std=c++20

@@ -1,0 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+cc_binary(
+    name ="setup_fork",
+    srcs = ["setup_fork.cc"],
+    deps = ["@com_google_absl//absl/strings"],
+)
+
+cc_binary(
+    name ="setup_module_folder",
+    srcs = ["setup_module_folder.cc"],
+    deps = ["@com_google_absl//absl/strings"],
+)
