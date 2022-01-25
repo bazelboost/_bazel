@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 		std::cout << cmd << std::endl;
 		std::system(cmd.c_str());
 
-		cmd = "git rebase upstream/develop";
+		cmd = "git merge upstream/develop";
 		std::cout << cmd << std::endl;
 		std::system(cmd.c_str());
 
@@ -75,9 +75,14 @@ int main(int argc, char* argv[]) {
 	}
 
 	fs::current_path(fork_path);
-	cmd = "code " + fork_path.generic_string();
+	cmd = "code " + fork_path.generic_string() + " --new-window --wait";
 	std::cout << cmd << std::endl;
-	std::system(cmd.c_str());
+	if(std::system(cmd.c_str()) == 0) {
+		std::cout << "Code returned success exit code. Pushing changes.\n";
+		cmd = "git push";
+		std::cout << cmd << std::endl;
+		std::system(cmd.c_str());
+	}
 
 	return 0;
 }
