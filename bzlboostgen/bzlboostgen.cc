@@ -62,13 +62,13 @@ const auto non_standard_boost_headers =
 		{"boost/detail/iterator.hpp", "core"},
 		{"boost/detail/lightweight_test.hpp", "core"},
 		{"boost/detail/no_exceptions_support.hpp", "core"},
-		{"boost/detail/scoped_enum_emulation", "core"},
+		{"boost/detail/scoped_enum_emulation.hpp", "core"},
 		{"boost/detail/sp_typeinfo.hpp", "core"},
 		{"boost/utility/addressof.hpp", "core"},
 		{"boost/utility/enable_if.hpp", "core"},
 		{"boost/utility/explicit_operator_bool.hpp", "core"},
 		{"boost/utility/swap.hpp", "core"},
-		{"boost/check_delete.hpp", "core"},
+		{"boost/checked_delete.hpp", "core"},
 		{"boost/get_pointer.hpp", "core"},
 		{"boost/iterator.hpp", "core"},
 		{"boost/non_type.hpp", "core"},
@@ -82,11 +82,11 @@ const auto non_standard_boost_headers =
 
 		{"boost/exception_ptr.hpp", "exception"},
 
-		{"boost/foeach_fwd.hpp", "foreach"},
+		{"boost/foreach_fwd.hpp", "foreach"},
 
 		{"boost/function_equal.hpp", "function"},
 
-		{"boost/detail/algorithm", "graph"},
+		{"boost/detail/algorithm.hpp", "graph"},
 		{"boost/pending/detail/disjoint_sets.hpp", "graph"},
 		{"boost/pending/detail/property.hpp", "graph"},
 		{"boost/pending/bucket_sorter.hpp", "graph"},
@@ -160,6 +160,7 @@ const auto non_standard_boost_headers =
 		{"boost/pointer_cast.hpp", "smart_ptr"},
 		{"boost/pointer_to_other.hpp", "smart_ptr"},
 		{"boost/scoped_array.hpp", "smart_ptr"},
+		{"boost/scoped_ptr.hpp", "smart_ptr"},
 		{"boost/shared_array.hpp", "smart_ptr"},
 		{"boost/shared_ptr.hpp", "smart_ptr"},
 		{"boost/smart_ptr.hpp", "smart_ptr"},
@@ -525,8 +526,6 @@ auto main(int argc, char* argv[]) -> int {
 		return 1;
 	}
 
-	
-
 	auto info = bzlmod_info{
 		.name = "boost." + find_boost_module_name(include_dir),
 		.version = "1.83.0",
@@ -555,7 +554,8 @@ auto main(int argc, char* argv[]) -> int {
 		std::async(
 			std::launch::async,
 			[&, info]() mutable {
-				if(!fs::exists(test_dir)) {
+				if(!fs::is_directory(test_dir) || fs::is_empty(test_dir)) {
+					std::cerr << std::format("[warning] no test directory for {}\n", info.name);
 					return;
 				}
 
@@ -563,6 +563,11 @@ auto main(int argc, char* argv[]) -> int {
 
 				info.name += ".test";
 				auto deps = write_bzlmod_files(test_dir, std::array{test_dir}, info);
+
+				const auto workspace_file_path = test_dir / "WORKSPACE.bazel";
+				if(!fs::exists(workspace_file_path)) {
+					write_file_contents(workspace_file_path, "# SEE: MODULE.bazel\n");
+				}
 
 				const auto build_file_path = test_dir / "BUILD.bazel";
 				if(!fs::exists(build_file_path)) {
@@ -649,16 +654,6 @@ auto main(int argc, char* argv[]) -> int {
 			std::launch::async,
 			[&, info] {
 				const auto workspace_file_path = dir / "WORKSPACE.bazel";
-				if(!fs::exists(workspace_file_path)) {
-					write_file_contents(workspace_file_path, "# SEE: MODULE.bazel\n");
-				}
-			}
-		),
-
-		std::async(
-			std::launch::async,
-			[&, info] {
-				const auto workspace_file_path = test_dir / "WORKSPACE.bazel";
 				if(!fs::exists(workspace_file_path)) {
 					write_file_contents(workspace_file_path, "# SEE: MODULE.bazel\n");
 				}
