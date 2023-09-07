@@ -9,3 +9,5 @@ build --registry=https://bcr.bazel.build
 
 build:windows --cxxopt=/std:c++latest
 build:linux --cxxopt=-std=c++2b
+
+try-import %workspace%/user.bazelrc
