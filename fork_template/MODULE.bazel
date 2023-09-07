@@ -1,5 +1,0 @@
-module(
-    name = "boost.{NAME}",
-    version = "1.78.0",
-    compatibility_level = 1,
-)

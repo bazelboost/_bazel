@@ -1,0 +1,23 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@bazel_skylib//lib:selects.bzl", "selects")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "bzlboostgen",
+    srcs = ["bzlboostgen.cc"],
+    copts = selects.with_or({
+        ("//conditions:default", "@rules_cc//cc/compiler:clang", "@rules_cc//cc/compiler:gcc", "@rules_cc//cc/compiler:mingw-gcc"): [
+            "-std=c++2b",
+            "-w",
+        ],
+        ("@rules_cc//cc/compiler:msvc-cl", "@rules_cc//cc/compiler:clang-cl"): [
+            "/std:c++latest",
+            "/permissive-",
+            "/w",
+        ],
+    }),
+    deps = [
+        "@abseil-cpp//absl/strings",
+    ],
+)
