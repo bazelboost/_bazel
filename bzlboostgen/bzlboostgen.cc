@@ -35,15 +35,159 @@ const auto non_standard_boost_headers =
 	std::unordered_map<std::string_view, std::string_view>{
 		{"boost/current_function.hpp", "assert"},
 
+		{"boost/memory_order.hpp", "atomic"},
+
+		{"boost/is_placeholder.hpp", "bind"},
+		{"boost/mem_fn.hpp", "bind"},
+
+		{"boost/circular_buffer_fwd.hpp", "circular_buffer"},
+
+		{"boost/concept/*", "concept_check"},
+		{"boost/concept_archetype.hpp", "concept_check"},
+
+		{"boost/functional/hash/*", "container_hash"},
+		{"boost/functional/hash.hpp", "container_hash"},
+		{"boost/functional/hash_fwd.hpp", "container_hash"},
+
+		{"boost/contract_macro.hpp", "contract"},
+
+		{"boost/make_default.hpp", "convert"},
+
 		{"boost/cstdint.hpp"sv, "config"sv},
 		{"boost/cxx11_char_types.hpp"sv, "config"sv},
 		{"boost/limits.hpp"sv, "config"sv},
 		{"boost/version.hpp"sv, "config"sv},
 		{"boost/detail/workaround.hpp"sv, "config"sv},
 
+		{"boost/detail/iterator.hpp", "core"},
+		{"boost/detail/lightweight_test.hpp", "core"},
+		{"boost/detail/no_exceptions_support.hpp", "core"},
+		{"boost/detail/scoped_enum_emulation", "core"},
+		{"boost/detail/sp_typeinfo.hpp", "core"},
+		{"boost/utility/addressof.hpp", "core"},
+		{"boost/utility/enable_if.hpp", "core"},
+		{"boost/utility/explicit_operator_bool.hpp", "core"},
+		{"boost/utility/swap.hpp", "core"},
+		{"boost/check_delete.hpp", "core"},
+		{"boost/get_pointer.hpp", "core"},
+		{"boost/iterator.hpp", "core"},
+		{"boost/non_type.hpp", "core"},
 		{"boost/noncopyable.hpp"sv, "core"sv},
+		{"boost/ref.hpp", "core"},
+		{"boost/swap.hpp", "core"},
+		{"boost/type.hpp", "core"},
+		{"boost/visit_each.hpp", "core"},
 
-		{"boost/make_shared.hpp"sv, "smart_ptr"sv},
+		{"boost/dynamic_bitset_fwd.hpp", "dynamic_bitset"},
+
+		{"boost/exception_ptr.hpp", "exception"},
+
+		{"boost/foeach_fwd.hpp", "foreach"},
+
+		{"boost/function_equal.hpp", "function"},
+
+		{"boost/detail/algorithm", "graph"},
+		{"boost/pending/detail/disjoint_sets.hpp", "graph"},
+		{"boost/pending/detail/property.hpp", "graph"},
+		{"boost/pending/bucket_sorter.hpp", "graph"},
+		{"boost/pending/container_traits.hpp", "graph"},
+		{"boost/pending/disjoint_sets.hpp", "graph"},
+		{"boost/pending/fenced_priority_queue.hpp", "graph"},
+		{"boost/pending/fibonacci_heap.hpp", "graph"},
+		{"boost/pending/indirect_cmp.hpp", "graph"},
+		{"boost/pending/is_heap.hpp", "graph"},
+		{"boost/pending/mutable_heap.hpp", "graph"},
+		{"boost/pending/mutable_queue.hpp", "graph"},
+		{"boost/pending/property.hpp", "graph"},
+		{"boost/pending/property_serialize.hpp", "graph"},
+		{"boost/pending/queue.hpp", "graph"},
+		{"boost/pending/relaxed_heap.hpp", "graph"},
+		{"boost/pending/stringtok.hpp", "graph"},
+
+		{"boost/graph/parallel/*", "graph_parallel"},
+		{"boost/graph/distributed/*", "graph_parallel"},
+		{"boost/graph/accounting.hpp", "graph_parallel"},
+
+		{"boost/pending/integer_log2.hpp", "integer"},
+		{"boost/integer_fwd.hpp", "integer"},
+		{"boost/integer_traits.hpp", "integer"},
+
+		{"boost/io_fwd.hpp", "io"},
+
+		{"boost/pending/detail/int_iterator.hpp", "iterator"},
+		{"boost/pending/iterator_adaptors.hpp", "iterator"},
+		{"boost/pending/iterator_tests.hpp", "iterator"},
+		{"boost/function_output_iterator.hpp", "iterator"},
+		{"boost/generator_iterator.hpp", "iterator"},
+		{"boost/indirect_reference.hpp", "iterator"},
+		{"boost/iterator_adaptors.hpp", "iterator"},
+		{"boost/next_prior.hpp", "iterator"},
+		{"boost/pointee.hpp", "iterator"},
+		{"boost/shared_container_iterator.hpp", "iterator"},
+
+		{"boost/detail/basic_pointerbuf.hpp", "lexical_cast"},
+		{"boost/detail/lcast_precision.hpp", "lexical_cast"},
+
+		{"boost/math_fwd.hpp", "math"},
+		{"boost/cstdfloat.hpp", "math"},
+
+		{"boost/multi_index_container.hpp", "multi_index"},
+		{"boost/multi_index_container_fwd.hpp", "multi_index"},
+
+		{"boost/numeric/conversion/*", "numeric_conversion"},
+		{"boost/cast.hpp", "numeric_conversion"},
+
+		{"boost/predef.h", "predef"},
+
+		{"boost/qvm_lite.hpp", "qvm"},
+
+		{"boost/nondet_random.hpp", "random"},
+
+		{"boost/cregex.hpp", "regex"},
+		{"boost/regex.h", "regex"},
+		{"boost/regex_fwd.hpp", "regex"},
+
+		{"boost/archive/*", "serialization"},
+
+		{"boost/detail/atomic_count.hpp", "smart_ptr"},
+		{"boost/detail/lightweight_mutex.hpp", "smart_ptr"},
+		{"boost/detail/lightweight_thread.hpp", "smart_ptr"},
+		{"boost/detail/quick_allocator.hpp", "smart_ptr"},
+		{"boost/enable_shared_from_this.hpp", "smart_ptr"},
+		{"boost/intrusive_ptr.hpp", "smart_ptr"},
+		{"boost/make_shared.hpp", "smart_ptr"},
+		{"boost/make_unique.hpp", "smart_ptr"},
+		{"boost/pointer_cast.hpp", "smart_ptr"},
+		{"boost/pointer_to_other.hpp", "smart_ptr"},
+		{"boost/scoped_array.hpp", "smart_ptr"},
+		{"boost/shared_array.hpp", "smart_ptr"},
+		{"boost/shared_ptr.hpp", "smart_ptr"},
+		{"boost/smart_ptr.hpp", "smart_ptr"},
+		{"boost/weak_ptr.hpp", "smart_ptr"},
+
+		{"boost/cerrno.hpp", "system"},
+
+		{"boost/progress.hpp", "timer"},
+
+		{"boost/token_functions.hpp", "tokenizer"},
+		{"boost/token_iterator.hpp", "tokenizer"},
+
+		{"boost/utility/declval.hpp", "type_traits"},
+		{"boost/aligned_storage.hpp", "type_traits"},
+
+		{"boost/unordered_map.hpp", "unordered"},
+		{"boost/unordered_set.hpp", "unordered"},
+
+		{"boost/detail/call_traits.hpp", "utility"},
+		{"boost/detail/compressed_pair.hpp", "utility"},
+		{"boost/detail/ob_compressed_pair.hpp", "utility"},
+		{"boost/call_traits.hpp", "utility"},
+		{"boost/compressed_pair.hpp", "utility"},
+		{"boost/operators.hpp", "utility"},
+		{"boost/operators_v1.hpp", "utility"},
+
+		{"boost/detail/winapi/*", "winapi"},
+		{"boost/detail/interlocked.hpp", "winapi"},
 
 		{"boost/exception/exception.hpp", "throw_exception"},
 
@@ -53,7 +197,45 @@ const auto non_standard_boost_headers =
 
 		{"boost/none.hpp", "optional"},
 		{"boost/none_t.hpp", "optional"},
+
+		{"boost/implicit_cast.hpp", "conversion"},
+		{"boost/polymorphic_cast.hpp", "conversion"},
+		{"boost/polymorphic_pointer_cast.hpp", "conversion"},
+
+		{"boost/parameter/python.hpp", "parameter_python"},
+		{"boost/parameter/aux_/python/invoker.hpp", "parameter_python"},
+		{"boost/parameter/aux_/python/invoker_iterate.hpp", "parameter_python"},
+
+		{"boost/cast.hpp", "numeric_conversion"},
+
+		{"boost/property_map/parallel/*", "property_map.parallel"},
 	};
+
+auto get_module_name_inc_path(std::string_view inc_path) -> std::string {
+	for(auto&& [non_standard_boost_header, mod] : non_standard_boost_headers) {
+		if(non_standard_boost_header.ends_with("*")) {
+			auto prefix = non_standard_boost_header.substr(
+				0,
+				non_standard_boost_header.length() - 1
+			);
+			if(inc_path.starts_with(prefix)) {
+				return std::string{mod};
+			}
+		}
+		if(non_standard_boost_header == inc_path) {
+			return std::string{mod};
+		}
+	}
+
+	std::vector<std::string_view> inc_path_parts = absl::StrSplit(inc_path, '/');
+
+	auto module_name = std::string{inc_path_parts[1]};
+	if(module_name.ends_with(".hpp")) {
+		module_name = module_name.substr(0, module_name.size() - ".hpp"sv.size());
+	}
+
+	return module_name;
+}
 
 constexpr auto BZLMOD_MODULE = R"starlark(
 module(
@@ -146,26 +328,11 @@ auto find_boost_deps(fs::path dir) noexcept -> std::set<std::string> {
 			auto inc_path_str =
 				std::string_view{split[1].data() + 1, split[1].size() - 2};
 
-			if(auto itr = non_standard_boost_headers.find(inc_path_str);
-				 itr != non_standard_boost_headers.end()) {
-				auto module_name = std::string{itr->second};
-				if(!deps.contains(module_name)) {
-					deps.insert(module_name);
-				}
+			if(!inc_path_str.starts_with("boost/")) {
 				continue;
 			}
 
-			std::vector<std::string_view> inc_path_parts =
-				absl::StrSplit(inc_path_str, '/');
-			if(inc_path_parts[0] != "boost") {
-				continue;
-			}
-
-			auto module_name = std::string{inc_path_parts[1]};
-			if(module_name.ends_with(".hpp")) {
-				module_name =
-					module_name.substr(0, module_name.size() - ".hpp"sv.size());
-			}
+			auto module_name = get_module_name_inc_path(inc_path_str);
 
 			if(!deps.contains(module_name)) {
 				deps.insert(module_name);
@@ -310,6 +477,38 @@ auto add_deps(
 	run_command(cmd, std::array{0, 3 /* no changes */});
 }
 
+auto find_boost_module_name(fs::path inc_dir) -> std::string {
+	auto module_names = std::set<std::string>{};
+	
+	for(auto entry : fs::recursive_directory_iterator(inc_dir)) {
+		if(entry.is_directory()) {
+			continue;
+		}
+		
+		auto inc_path = fs::relative(entry.path(), inc_dir).generic_string();
+		assert(inc_path.starts_with("boost/"));
+		auto module_name = get_module_name_inc_path(inc_path);
+		if(!module_names.contains(module_name)) {
+			module_names.insert(module_name);
+		}
+	}
+
+	if(module_names.empty()) {
+		std::cerr << std::format("Failed to find module name in dir {}\n", inc_dir.generic_string());
+		std::exit(1);
+	}
+
+	if(module_names.size() > 1) {
+		std::cerr << "Module name is ambiguous. Found these names:\n";
+		for(auto module_name : module_names) {
+			std::cerr << " - " << module_name << "\n";
+		}
+		std::exit(1);
+	}
+
+	return *module_names.begin();
+}
+
 auto main(int argc, char* argv[]) -> int {
 	std::set_terminate([]() {
 		std::cerr << std::stacktrace::current();
@@ -326,8 +525,10 @@ auto main(int argc, char* argv[]) -> int {
 		return 1;
 	}
 
+	
+
 	auto info = bzlmod_info{
-		.name = "boost." + dir.filename().generic_string(),
+		.name = "boost." + find_boost_module_name(include_dir),
 		.version = "1.83.0",
 		.compatibility_level = 108300,
 	};
