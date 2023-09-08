@@ -18,6 +18,9 @@ cc_binary(
         ],
     }),
     deps = [
+        "@nlohmann_json//:json",
+        "@bazelboost_registry//tools:config_types",
         "@abseil-cpp//absl/strings",
+        "@gflags",
     ],
 )

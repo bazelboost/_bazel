@@ -11,13 +11,35 @@
 #include <future>
 #include <stacktrace>
 #include <unordered_map>
+#include <gflags.h>
+#include "nlohmann/json.hpp"
+#include "tools/config_types.hh"
 #include "absl/strings/str_split.h"
 
 using absl::ByAnyChar;
 using absl::SkipWhitespace;
+using json = nlohmann::json;
 
 namespace fs = std::filesystem;
 using namespace std::string_view_literals;
+
+DEFINE_string(dir, "", "module directory (defaults to current directory)");
+
+DEFINE_string(module_version, "", "version to give to module");
+DEFINE_validator(module_version, [](auto, const auto& module_version) -> bool {
+	return !module_version.empty();
+});
+
+DEFINE_string(
+	registry,
+	"",
+	"path to registry. used to lookup dependency versions"
+);
+DEFINE_validator(registry, [](auto, const auto& registry) {
+	return !registry.empty();
+});
+
+DEFINE_bool(skip_tests, false, "on't generate test module files");
 
 constexpr auto cpp_extensions = std::array{
 	".hpp"sv,
@@ -210,6 +232,11 @@ const auto non_standard_boost_headers =
 		{"boost/cast.hpp", "numeric_conversion"},
 
 		{"boost/property_map/parallel/*", "property_map.parallel"},
+
+		{"boost/numeric/ublas/*", "ublas"},
+
+		{"boost/numeric/interval.hpp", "interval"},
+		{"boost/numeric/interval/*", "interval"},
 	};
 
 auto get_module_name_inc_path(std::string_view inc_path) -> std::string {
@@ -258,7 +285,17 @@ build --incompatible_strict_action_env
 build --enable_runfiles
 build --registry=https://raw.githubusercontent.com/bazelboost/registry/main
 build --registry=https://bcr.bazel.build
+
+try-import %workspace%/user.bazelrc
 )bazelrc";
+
+constexpr auto GITIGNORE_DEFAULT = R"gitignore(
+/bazel-*
+/external
+/.cache
+/compile_commands.json
+user.bazelrc
+)gitignore";
 
 constexpr auto BZLMOD_GITHUB_WORKFLOW = R"yaml(name: Bzlmod Archive
 
@@ -333,7 +370,19 @@ auto find_boost_deps(fs::path dir) noexcept -> std::set<std::string> {
 				continue;
 			}
 
+			// ublas refers to these headers even though they are not available (yet)
+			if(inc_path_str.starts_with("boost/numeric/bindings")) {
+				continue;
+			}
+
 			auto module_name = get_module_name_inc_path(inc_path_str);
+			if(module_name == "numeric") {
+				std::cerr << std::format(
+					"numeric is an invalid module name. Check include: {}\n",
+					inc_path_str
+				);
+				std::exit(1);
+			}
 
 			if(!deps.contains(module_name)) {
 				deps.insert(module_name);
@@ -393,6 +442,33 @@ struct bzlmod_info {
 	int         compatibility_level;
 };
 
+auto lookup_dep_version(std::string module_name) -> std::string {
+	auto module_dir = fs::path{FLAGS_registry} / "modules" / module_name;
+
+	if(!fs::exists(module_dir)) {
+		std::cerr << std::format(
+			"Cannot find module directory: {}\n",
+			module_dir.generic_string()
+		);
+		std::exit(1);
+	}
+
+	bazel_registry::metadata_config metadata =
+		json::parse(std::ifstream{module_dir / "metadata.json"});
+
+	if(metadata.versions.empty()) {
+		std::cerr << std::format(
+			"No versions available for {} found in {}\n",
+			module_name,
+			(module_dir / "metadata.json").generic_string()
+		);
+		std::exit(1);
+	}
+
+	// The last version for bazelboost modules is the latest
+	return metadata.versions.back();
+}
+
 auto write_bzlmod_files(
 	auto&&                    dir,
 	std::ranges::range auto&& target_source_dirs,
@@ -428,10 +504,16 @@ auto write_bzlmod_files(
 
 	bzlmod_file << "\n";
 
+	bzlmod_file << "\n" << std::format(BZLMOD_BAZEL_DEP, "rules_cc", "0.0.8");
+
 	for(auto&& dep : deps) {
+		auto dep_version = dep == info.name //
+			? info.version
+			: lookup_dep_version("boost." + dep);
+
 		bzlmod_file //
 			<< "\n"
-			<< std::format(BZLMOD_BAZEL_DEP, "boost." + dep, info.version);
+			<< std::format(BZLMOD_BAZEL_DEP, "boost." + dep, dep_version);
 	}
 
 	bzlmod_file << "\n";
@@ -480,12 +562,12 @@ auto add_deps(
 
 auto find_boost_module_name(fs::path inc_dir) -> std::string {
 	auto module_names = std::set<std::string>{};
-	
+
 	for(auto entry : fs::recursive_directory_iterator(inc_dir)) {
 		if(entry.is_directory()) {
 			continue;
 		}
-		
+
 		auto inc_path = fs::relative(entry.path(), inc_dir).generic_string();
 		assert(inc_path.starts_with("boost/"));
 		auto module_name = get_module_name_inc_path(inc_path);
@@ -495,7 +577,10 @@ auto find_boost_module_name(fs::path inc_dir) -> std::string {
 	}
 
 	if(module_names.empty()) {
-		std::cerr << std::format("Failed to find module name in dir {}\n", inc_dir.generic_string());
+		std::cerr << std::format(
+			"Failed to find module name in dir {}\n",
+			inc_dir.generic_string()
+		);
 		std::exit(1);
 	}
 
@@ -515,7 +600,11 @@ auto main(int argc, char* argv[]) -> int {
 		std::cerr << std::stacktrace::current();
 		std::abort();
 	});
-	const auto dir = argc > 1 ? fs::path{argv[1]} : fs::current_path();
+
+	gflags::SetUsageMessage("Generate bazel module for boost module");
+	gflags::ParseCommandLineFlags(&argc, &argv, false);
+
+	const auto dir = FLAGS_dir.empty() ? fs::current_path() : fs::path{FLAGS_dir};
 	const auto include_dir = dir / "include";
 	const auto test_dir = dir / "test";
 
@@ -528,7 +617,7 @@ auto main(int argc, char* argv[]) -> int {
 
 	auto info = bzlmod_info{
 		.name = "boost." + find_boost_module_name(include_dir),
-		.version = "1.83.0",
+		.version = FLAGS_module_version,
 		.compatibility_level = 108300,
 	};
 
@@ -554,8 +643,13 @@ auto main(int argc, char* argv[]) -> int {
 		std::async(
 			std::launch::async,
 			[&, info]() mutable {
+				if(FLAGS_skip_tests) {
+					return;
+				}
+
 				if(!fs::is_directory(test_dir) || fs::is_empty(test_dir)) {
-					std::cerr << std::format("[warning] no test directory for {}\n", info.name);
+					std::cerr
+						<< std::format("[warning] no test directory for {}\n", info.name);
 					return;
 				}
 
@@ -637,6 +731,15 @@ auto main(int argc, char* argv[]) -> int {
 				const auto bazelrc_path = dir / ".bazelrc";
 				if(!fs::exists(bazelrc_path)) {
 					write_file_contents(bazelrc_path, BAZELRC_DEFAULT);
+				}
+			}
+		),
+		std::async(
+			std::launch::async,
+			[&, info] {
+				const auto gitignore_path = dir / ".gitignore";
+				if(!fs::exists(gitignore_path)) {
+					write_file_contents(gitignore_path, GITIGNORE_DEFAULT);
 				}
 			}
 		),
